@@ -25,20 +25,19 @@ defmodule Gy do
   def dec2rad(rad, n, prev), do: dec2rad(rad, div(n, rad), [rem(n, rad) | prev])
 
   @spec last_er([any]) :: {:ok, any} | :error
-  def last_er([a | []]), do: {:ok, a}
-  def last_er([_ | b]), do: last_er(b)
   def last_er([]), do: :error
+  def last_er([a]), do: {:ok, a}
+  def last_er([_ | b]), do: last_er(b)
 
   @spec last_ex([any]) :: any | nil
-  def last_ex([a | []]), do: a
-  def last_ex([_ | b]), do: last_ex(b)
   def last_ex([]), do: nil
+  def last_ex([a]), do: a
+  def last_ex([_ | b]), do: last_ex(b)
 
   @spec at([any], integer) :: any | nil
-  def at(_, n) when n < 0, do: nil
-  def at([], _), do: nil
   def at([a | _], 0), do: a
-  def at([_ | b], n), do: at(b, n - 1)
+  def at([_ | b], n) when n > 0, do: at(b, n - 1)
+  def at(_, _), do: nil
 
   @spec split([any], integer) :: {[any], [any]}
   def split(l, n) when n < 0, do: {[], l}
