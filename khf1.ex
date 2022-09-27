@@ -38,7 +38,7 @@ defmodule Khf1 do
     |> String.split(~r/[\s]/)
     |> Enum.reject(&(&1 === ""))
   end
-  # TODO throw out empty lines including the first line
+  
   @spec convert_first_line([String]) :: puzzle_desc
   defp convert_first_line([first_line | rest]) do
     tentsCountCols =
