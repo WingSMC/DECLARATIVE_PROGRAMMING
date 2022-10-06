@@ -3,7 +3,7 @@ defmodule Khf3 do
   @moduledoc """
   Kemping helyessége
   @author "Dremák Gergely <gergely089@gmai.com>"
-  @date   "2022-10-8"
+  @date   "2022-10-7"
   """
 
   @type row   :: integer                                            # sor száma (1-től n-ig)
@@ -12,6 +12,7 @@ defmodule Khf3 do
   @type tents_count_rows :: [integer]                               # a sátrak száma soronként
   @type tents_count_cols :: [integer]                               # a sátrak száma oszloponként
   @type trees       :: [field]                                      # a fákat tartalmazó parcellák koordinátái lexikálisan rendezve
+  @type tents       :: [field]                                      # a sátrakat tartalmazó parcellák koordinátái lexikálisan rendezve
   @type puzzle_desc :: {tents_count_rows, tents_count_cols, trees}  # a feladványleíró hármas
   @type dir       :: :n | :e | :s | :w                              # a sátorpozíciók iránya: north, east, south, west
   @type tent_dirs :: [dir]                                          # a sátorpozíciók irányának listája a fákhoz képest
@@ -23,67 +24,71 @@ defmodule Khf3 do
   @type errs_desc :: {err_rows, err_cols, err_touch}                # hibaleíró hármas
 
   @spec check_sol(pd::puzzle_desc, ds::tent_dirs) :: ed::errs_desc
-  # Az {rs, cs, ts} = pd feladványleíró és a ds sátorirány-lista
-  # alapján elvégzett ellenőrzés eredménye a cd hibaleíró, ahol
-  #   rs a sátrak soronként elvárt számának a listája,
-  #   cs a sátrak oszloponként elvárt számának a listája,
-  #   ts a fákat tartalmazó parcellák koordinátájának a listája
-  # Az {e_rows, e_cols, e_touch} = ed hármas elemei olyan
-  # kulcs-érték párok, melyekben a kulcs a hiba jellegére utal, az
-  # érték pedig a hibahelyeket felsoroló lista (üres, ha nincs hiba)
-  def check_sol({rs, cs, ts}, ds) do
-    {err_rows, err_cols, err_touch} = check_sol1({rs, cs, ts}, ds)
+  def check_sol({rows, cols, tree_coords}, tent_dirs) do
+    tent_coords =
+      tree_coords
+      |> Enum.zip(tent_dirs)
+      |> Enum.map(fn {{y, x}, tent} ->
+        {dy, dx} =
+          case tent do
+            :n -> {-1, 0}
+            :e -> {0, 1}
+            :s -> {1, 0}
+            :w -> {0, -1}
+          end
+        {dy + y, dx + x}
+      end)
+      |> Enum.sort()
+
+    err_rows = check_rows(rows, tent_coords)
+    err_cols = check_cols(cols, tent_coords)
+    err_touch = check_touch(tent_coords)
+
+    {err_rows, err_cols, err_touch}
+  end
+
+  @spec check_rows(tents_count_rows, tents) :: err_rows
+  defp check_rows(rows, coords) do
+    %{err_rows: errs(rows, Enum.map(coords, fn {y, _x} -> y end))}
+  end
+  @spec check_cols(tents_count_rows, tents) :: err_cols
+  defp check_cols(cols, coords) do
+    %{err_cols: errs(cols, Enum.map(coords, fn {_y, x} -> x end))}
+  end
+
+  @spec errs(axis_counts::[integer], axis_actuals::[integer]) :: [integer]
+  defp errs(as, aas) do
+    solution_map =
+      Enum.group_by(aas, & &1)
+      |> Map.to_list()
+      |> Enum.map(fn {k, v} -> {k, length(v)} end)
+      |> Map.new()
+
+    for i <- 1..length(as) do
+      actual_count = case solution_map[i] do
+        nil -> 0
+        v -> v
+      end
+      this_should_be_the_count = Enum.at(as, i - 1)
+      if  actual_count === this_should_be_the_count or this_should_be_the_count < 0 do
+        nil else i
+      end
+    end
+    |> Enum.reject(& &1 === nil)
+  end
+
+  @spec check_touch(tents) :: err_touch
+  defp check_touch(coords) do
+    touches =
+      coords
+      |> Enum.filter(fn {y, x} ->
+        Enum.any?(coords, fn {y2, x2} ->
+          dy = y2 - y
+          dx = x2 - x
+          dy in [-1, 0, 1] and dx in [-1, 0, 1] and not (dy === 0 and dx === 0)
+        end)
+      end)
+
+    %{err_touch: touches}
   end
 end
-
-
-p0 = {pd0, ts0} =
-  { {[-1, 0, 0, -3, 0], [0, 0, -2, 0, 0], []}, [] }
-p1 = {pd1, ts1} =
-  { {[1, 0, 0, 3, 0], [0, 0, 2, 0, 0], []}, [] }
-p2 = {pd2, ts2} =
-  { {[1, 1, 0, 3, 0], [1, 0, 2, 0, 2], [{1, 2}, {3, 3}, {3, 5}, {5, 1}, {5, 5}]}, [:e,:s,:n,:n,:n] }
-p3 = {pd3, ts3} =
-  { {[1, 1, 0, 3, 0], [1, 0, 2, 0, 2], [{1, 2}, {3, 3}, {3, 5}, {5, 1}, {5, 5}]}, [:e,:e,:n,:n,:n] }
-p4 = {pd4, ts4} =
-  { {[1, 0, 2, 2, 0], [1, 0, 0, 2, 1], [{1, 2}, {3, 3}, {3, 5}, {5, 1}, {5, 5}]}, [:e,:e,:n,:n,:n] }
-p5 = {pd5, ts5} =
-  { {[1, 1, -1, 3, 0], [1, 0, -2, 0, 2], [{1, 2}, {3, 3}, {3, 5}, {5, 1}, {5, 5}]}, [:e,:s,:n,:n,:w] }
-
-IO.puts "--- p0"
-pd0 |> IO.inspect
-ts0 |> IO.inspect
-Khf2.to_external pd0, ts0, "x.txt"; (File.read! "x.txt") |> IO.write
-(Khf3.check_sol pd0, ts0) |> IO.inspect
-
-IO.puts "--- p1"
-pd1 |> IO.inspect
-ts1 |> IO.inspect
-Khf2.to_external pd1, ts1, "x.txt"; (File.read! "x.txt") |> IO.write
-(Khf3.check_sol pd1, ts1) |> IO.inspect
-
-
-IO.puts "--- p2"
-pd2 |> IO.inspect
-ts2 |> IO.inspect
-Khf2.to_external pd2, ts2, "x.txt"; (File.read! "x.txt") |> IO.write
-(Khf3.check_sol pd2, ts2) |> IO.inspect
-
-IO.puts "--- p3"
-pd3 |> IO.inspect
-ts3 |> IO.inspect
-Khf2.to_external pd3, ts3, "x.txt"; (File.read! "x.txt") |> IO.write
-(Khf3.check_sol pd3, ts3) |> IO.inspect
-
-IO.puts "--- p4"
-pd4 |> IO.inspect
-ts4 |> IO.inspect
-Khf2.to_external pd4, ts4, "x.txt"; (File.read! "x.txt") |> IO.write
-(Khf3.check_sol pd4, ts4) |> IO.inspect
-
-IO.puts "--- p5"
-pd5 |> IO.inspect
-ts5 |> IO.inspect
-Khf2.to_external pd5, ts5, "x.txt"; (File.read! "x.txt") |> IO.write
-(Khf3.check_sol pd5, ts5) |> IO.inspect
-IO.puts "---"
