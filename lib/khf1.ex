@@ -25,7 +25,7 @@ defmodule Khf1 do
   @type puzzle_desc :: {tents_count_rows, tents_count_cols, trees} # a feladványleíró hármas
   @spec to_internal(file_name :: String.t()) :: puzzle_desc
   def to_internal(file_name) do
-    file_content = file_name
+    file_name
     |> File.read!()
     |> String.split("\n")
     |> Enum.reject(&String.match?(&1, ~r/^\s*$/))
@@ -38,7 +38,7 @@ defmodule Khf1 do
     |> String.split(~r/[\s]/)
     |> Enum.reject(&(&1 === ""))
   end
-  
+
   @spec convert_first_line([String]) :: puzzle_desc
   defp convert_first_line([first_line | rest]) do
     tentsCountCols =
