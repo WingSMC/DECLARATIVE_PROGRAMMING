@@ -23,7 +23,7 @@ defmodule Khf1 do
   @type tents_count_cols :: [integer]  # a sátrak száma oszloponként
   @type trees            :: [field]    # a fákat tartalmazó parcellák koordinátái lexikálisan rendezve
   @type puzzle_desc :: {tents_count_rows, tents_count_cols, trees} # a feladványleíró hármas
-  @spec to_internal(file_name :: String.t()) :: puzzle_desc
+  @spec to_internal(file_name :: String.t) :: puzzle_desc
   def to_internal(file_name) do
     file_name
     |> File.read!()
@@ -32,14 +32,14 @@ defmodule Khf1 do
     |> convert_first_line()
   end
 
-  @spec to_tokens(String) :: [String]
+  @spec to_tokens(String.t) :: [String.t]
   defp to_tokens(line) do
     line
     |> String.split(~r/[\s]/)
     |> Enum.reject(&(&1 === ""))
   end
 
-  @spec convert_first_line([String]) :: puzzle_desc
+  @spec convert_first_line([String.t]) :: puzzle_desc
   defp convert_first_line([first_line | rest]) do
     tentsCountCols =
       first_line
@@ -51,7 +51,7 @@ defmodule Khf1 do
   end
 
   @spec convert_rest(
-    line_arr :: [String],
+    line_arr :: [String.t],
     line_idx :: integer,
     cs :: tents_count_cols,
     ts :: trees
@@ -63,7 +63,7 @@ defmodule Khf1 do
     convert_rest(rest, line_idx + 1, cs ++ [col], ts ++ trees)
   end
 
-  @spec convert_line(line :: String, line_idx :: integer) :: {integer, trees}
+  @spec convert_line(line :: String.t, line_idx :: integer) :: {integer, trees}
   defp convert_line(line, line_idx) do
     tokens = to_tokens(line)
     [col | cells] = tokens
@@ -72,7 +72,7 @@ defmodule Khf1 do
   end
 
   @spec convert_cells(
-    cells :: [String],
+    cells :: [String.t],
     line_idx :: integer,
     col_idx :: integer,
     trees :: trees
