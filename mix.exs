@@ -1,12 +1,12 @@
-defmodule Proj.MixProject do
+defmodule Decla.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :proj,
+      app: :decla,
       version: "0.1.0",
       elixir: "~> 1.12",
-      start_permanent: Mix.env() == :prod,
+      start_permanent: Mix.env() == :dev,
       deps: deps()
     ]
   end

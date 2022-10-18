@@ -19,7 +19,7 @@ defmodule Gy do
       end)
   end
 
-  @spec dec2rad(rad :: integer, n :: integer) :: integer
+  @spec dec2rad(rad :: integer, integer, prev::list()) ::  [integer]
   def dec2rad(rad, n, prev \\ [])
   def dec2rad(rad, n, prev) when n < rad, do: [n | prev]
   def dec2rad(rad, n, prev), do: dec2rad(rad, div(n, rad), [rem(n, rad) | prev])

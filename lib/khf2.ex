@@ -15,10 +15,15 @@ defmodule Khf2 do
   @type obstacles   :: [obstacle]                                   # a fák és a sátrak jelölései és koordinátái lexikálisan rendezve
   @type puzzle_desc :: {tents_count_rows, tents_count_cols, trees}  # a feladványleíró hármas
   @type dir         :: :n | :e | :s | :w                            # a sátorpozíciók iránya: north, east, south, west
-  @type tent_dirs   :: [dir]                                        # a sátorpozíciók irányának listája a fákhoz képest
+  @type tent_dirs   :: [dir]
+
+  @spec to_external(pd :: puzzle_desc, ds :: tent_dirs, file :: String.t()) :: :ok
+  def to_external(pd, ds, file) do
+    File.write!(file, to_string(pd, ds))
+  end                              # a sátorpozíciók irányának listája a fákhoz képest
 
   @spec to_string(puzzle_desc, tent_dirs) :: String.t
-  defp to_string({rows, cols, tree_coords}, tent_dirs) do
+  def to_string({rows, cols, tree_coords}, tent_dirs) do
     tent_coords =
       tree_coords
       |> Enum.zip(tent_dirs)
@@ -35,6 +40,7 @@ defmodule Khf2 do
 
     obstacles = Enum.map(tree_coords, &({"*", &1})) ++ tent_coords
 
+    cell_size = 4
     w = Enum.count(cols)
     h = Enum.count(rows)
 
@@ -44,15 +50,16 @@ defmodule Khf2 do
           nil -> "-"
           {ds, _} -> ds
         end
+        |> String.pad_leading(cell_size)
       end
-      "#{Enum.at(rows, y - 1)} #{Enum.join(row, " ")}\n"
+      row_count_string = Integer.to_string(Enum.at(rows, y - 1))
+      "#{String.pad_leading(row_count_string, cell_size)}#{Enum.join(row)}\n"
     end
 
-    "  #{Enum.join(cols, " ")}\n" <> Enum.join(string_rows)
-  end
+    first_line = cols
+    |> Enum.map(&(String.pad_leading(Integer.to_string(&1), cell_size)))
+    |> Enum.join()
 
-  @spec to_external(pd :: puzzle_desc, ds :: tent_dirs, file :: String.t()) :: :ok
-  def to_external(pd, ds, file) do
-    File.write!(file, to_string(pd, ds))
+    "#{String.duplicate(" ", cell_size)}#{first_line}\n#{Enum.join(string_rows)}"
   end
 end
