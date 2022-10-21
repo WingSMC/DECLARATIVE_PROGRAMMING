@@ -5,7 +5,7 @@ defmodule Decla.MixProject do
     [
       app: :decla,
       version: "0.1.0",
-      elixir: "~> 1.12",
+      elixir: "~> 1.9",
       start_permanent: Mix.env() == :dev,
       deps: deps()
     ]
