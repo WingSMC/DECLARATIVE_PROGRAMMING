@@ -1,21 +1,15 @@
-# Proj
+# Declarative programming homeworks made by [Gergely Dremák](https://github.com/WingSMC)
 
-**TODO: Add description**
+## Elixir
 
-## Installation
+- [x] [khf1](./lib/khf1.ex)
+- [x] [khf2](./lib/khf2.ex)
+- [x] [khf3](./lib/khf3.ex)
+- [ ] [nhf1](./lib/nhf1.ex)
 
-If [available in Hex](https://hex.pm/docs/publish), the package can be installed
-by adding `proj` to your list of dependencies in `mix.exs`:
+## Prolog
 
-```elixir
-def deps do
-  [
-    {:proj, "~> 0.1.0"}
-  ]
-end
-```
-
-Documentation can be generated with [ExDoc](https://github.com/elixir-lang/ex_doc)
-and published on [HexDocs](https://hexdocs.pm). Once published, the docs can
-be found at [https://hexdocs.pm/proj](https://hexdocs.pm/proj).
-
+- [x] [khf4](./prolog/khf4.pl)
+- [ ] [khf5](./prolog/khf5.pl)
+- [ ] khf6
+- [ ] nhf2
