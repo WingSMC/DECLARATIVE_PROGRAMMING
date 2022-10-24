@@ -39,24 +39,18 @@ make_tent_coords([TH|TT], [Y-X|TentCoordsRest], N-M) :-
 
 % Generates a matrix of 0s and 1s based on the tent coordinates.
 generate_matrix(N-M, TentCoords, [Row|MatrixRest], Y) :-
-	(
-		Y1 is Y + 1,
-		(Y1 =< N) ->
-			generate_matrix(N-M, TentCoords, MatrixRest, Y1);
-			MatrixRest = []
-	),
+	Y1 is Y + 1,
+	(Y1 =< N ->
+		generate_matrix(N-M, TentCoords, MatrixRest, Y1);
+		MatrixRest = []),
 	generate_row(M, TentCoords, Y-1, Row).
 
 % Generates a list as a row for the matrix made of 0s and 1s based on the tent coordinates.
 generate_row(M, TentCoords, Y-X, Row) :-
-	(
-		X1 is X+1,
-		(X1 =< M) ->
-			generate_row(M, TentCoords, Y-X1, RowRest);
-			RowRest = []
-	),
-	(
-		(member(Y-X, TentCoords)) ->
-			Row = [1|RowRest];
-			Row = [0|RowRest]
-	).
+	X1 is X+1,
+	(X1 =< M ->
+		generate_row(M, TentCoords, Y-X1, RowRest);
+		RowRest = []),
+	(member(Y-X, TentCoords) ->
+		Row = [1|RowRest];
+		Row = [0|RowRest]).
