@@ -10,6 +10,6 @@
 ## Prolog
 
 - [x] [khf4](./prolog/khf4.pl)
-- [ ] [khf5](./prolog/khf5.pl)
-- [ ] khf6
+- [x] [khf5](./prolog/khf5.pl)
+- [ ] [khf6](./prolog/khf6.pl)
 - [ ] nhf2

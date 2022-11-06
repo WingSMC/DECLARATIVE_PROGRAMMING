@@ -187,12 +187,15 @@ További szűkítést nem kaptunk, de az ellentmondásra utaló ILs3 = [] válas
 ```prolog
 convert_to_coords([1-1, 2-3, 2-3, 3-2], [e,n,s,w], [1-2, 1-3, 3-3, 3-1]).
 
+get_and_test_nth_tree([1-1, 2-2, 3-3], [[s],[e],[w]], 1, 1-3-0-2).
+\+ get_and_test_nth_tree([1-1, 2-2, 3-3], [[s,e],[e],[w]], 1, A).
+
 iranylistak(2-3, [1-1,2-2], [[e,s],[e,n,w]]).
 iranylistak(3-3, [1-1,2-1], [[e],[e,s]]).
 iranylistak(6-6, [1-3,1-5,3-1,4-6,5-1,5-4,6-5], [[e,s,w],[e,s,w],[e,n,s],[n,s,w],[e,n,s],[e,n,s,w],[e,n,w]]).
 iranylistak(2-3, [1-1,1-2,2-1], []).
 
-sator_szukites([1-1,2-2], 2, [[e],[n,s]], ILs).
+\+ sator_szukites([1-1,2-2], 2, [[e],[n,s]], ILs).
 sator_szukites([1-1,2-2], 2, [[e,s],[s]], [[e],[s]]).
 sator_szukites([5-2,2-2], 1, [[n],[e,n,s,w]], [[n],[e,n,w]]).
 sator_szukites([4-2,2-2], 1, [[n],[e,n,s,w]], [[n],[n]]).
