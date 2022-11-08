@@ -31,7 +31,7 @@ dir_map(Dir, [TY-TX-DirsIn|Is], Coord, ForcedTrees, FreeTrees, UselessTrees) :-
 		(C =:= Coord - 1) -> (dir(Dir, low,  Need, NotNeed));
 		(C =:= Coord    ) -> (dir(Dir, mid,  Need, NotNeed));
 		(C =:= Coord + 1) -> (dir(Dir, high, Need, NotNeed));
-		Need = [x] % will never match
+		Need = [] % will never match
 	),
 	(contains_any(DirsIn, Need) -> (
 		UselessTrees = UTs,
@@ -82,7 +82,8 @@ dir(row, high, [n], [e,s,w]) :- !.
 sel(col, _-TX, TX) :- !.
 sel(row, TY-_, TY) :- !.
 
-contains_any([], []) :- !.
+contains_any(_, []) :- !, fail.
+contains_any([], _) :- !, fail.
 contains_any([X|Xs], Ys) :-
 	member(X, Ys) ->
 		true;
