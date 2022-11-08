@@ -21,8 +21,6 @@ helper(Dir, Coord, NeededSum, Trees, DirsIn, DirsOut) :-
 		)
 	).
 
-
-
 dir_map(_, [], _, [], [], []) :- !.
 dir_map(Dir, [TY-TX-DirsIn|Is], Coord, ForcedTrees, FreeTrees, UselessTrees) :-
 	dir_map(Dir, Is, Coord, FoTs, FrTs, UTs),
@@ -71,6 +69,7 @@ constrain_from_coord(Dir, Coord, [X-Y-Dirs|Is], [X-Y-OutDirs|Os]) :-
 	custom_intersection(Dirs, NotNeed, OutDirs).
 
 
+
 dir(col, low, [e], [n,s,w]) :- !.
 dir(col, mid, [n,s], [e,w]) :- !.
 dir(col, high, [w], [e,n,s]) :- !.
@@ -82,13 +81,6 @@ dir(row, high, [n], [e,s,w]) :- !.
 sel(col, _-TX, TX) :- !.
 sel(row, TY-_, TY) :- !.
 
-contains_any(_, []) :- !, fail.
-contains_any([], _) :- !, fail.
-contains_any([X|Xs], Ys) :-
-	member(X, Ys) ->
-		true;
-		contains_any(Xs, Ys).
-
 zip([], [], []) :- !.
 zip([Y|Ys], [X|Xs], [Y-X|Zs]) :-
 	zip(Ys, Xs, Zs).
@@ -98,6 +90,13 @@ union3_sort_unzip(Set1, Set2, Set3, Result) :-
 	custom_union(S12, Set3, S123),
 	sort(S123, Sorted),
 	zip(_, Result, Sorted).
+
+contains_any(_, []) :- !, fail.
+contains_any([], _) :- !, fail.
+contains_any([X|Xs], Ys) :-
+	member(X, Ys) ->
+		true;
+		contains_any(Xs, Ys).
 
 custom_intersection([], _, []) :- !.
 custom_intersection([X|Xs], Ys, Zs) :-
