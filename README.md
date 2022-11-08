@@ -11,5 +11,5 @@
 
 - [x] [khf4](./prolog/khf4.pl)
 - [x] [khf5](./prolog/khf5.pl)
-- [ ] [khf6](./prolog/khf6.pl)
+- [x] [khf6+](./prolog/khf6.pl)
 - [ ] nhf2
