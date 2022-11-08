@@ -84,7 +84,6 @@ sel(row, TY-_, TY) :- !.
 
 contains_any([], []) :- !.
 contains_any([X|Xs], Ys) :-
-	notrace,
 	member(X, Ys) ->
 		true;
 		contains_any(Xs, Ys).
