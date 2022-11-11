@@ -17,7 +17,8 @@ helper(Dir, Coord, NeededSum, Trees, DirsIn, DirsOut) :-
 				(MaxSum =:= NeededSum) -> constrain_to_coord(Dir, Coord, FreeZip, ConstrainedFreeZip);
 				(fail)
 			),
-			union3_sort_unzip(ConstrainedFreeZip, ForcedZip, UselessZip, DirsOut)
+			union3(ConstrainedFreeZip, ForcedZip, UselessZip, DirsOutUnsortedZipped),
+			arrange(Trees, DirsOutUnsortedZipped, DirsOut)
 		)
 	).
 
@@ -47,9 +48,9 @@ dir_map(Dir, [TY-TX-DirsIn|Is], Coord, ForcedTrees, FreeTrees, UselessTrees) :-
 	)).
 
 constrain_to_coord(_, _, [], []) :- !.
-constrain_to_coord(Dir, Coord, [X-Y-Dirs|Is], [X-Y-OutDirs|Os]) :-
+constrain_to_coord(Dir, Coord, [Y-X-Dirs|Is], [Y-X-OutDirs|Os]) :-
 	constrain_to_coord(Dir, Coord, Is, Os),
-	sel(Dir, X-Y, C),
+	sel(Dir, Y-X, C),
 	(
 		(C  <  Coord) -> (dir(Dir, low,  Need, _));
 		(C =:= Coord) -> (dir(Dir, mid,  Need, _));
@@ -58,9 +59,9 @@ constrain_to_coord(Dir, Coord, [X-Y-Dirs|Is], [X-Y-OutDirs|Os]) :-
 	custom_intersection(Dirs, Need, OutDirs).
 	
 constrain_from_coord(_, _, [], []) :- !.
-constrain_from_coord(Dir, Coord, [X-Y-Dirs|Is], [X-Y-OutDirs|Os]) :-
+constrain_from_coord(Dir, Coord, [Y-X-Dirs|Is], [Y-X-OutDirs|Os]) :-
 	constrain_from_coord(Dir, Coord, Is, Os),
-	sel(Dir, X-Y, C),
+	sel(Dir, Y-X, C),
 	(
 		(C  <  Coord) -> (dir(Dir, low,  _, NotNeed));
 		(C =:= Coord) -> (dir(Dir, mid,  _, NotNeed));
@@ -85,12 +86,6 @@ zip([], [], []) :- !.
 zip([Y|Ys], [X|Xs], [Y-X|Zs]) :-
 	zip(Ys, Xs, Zs).
 
-union3_sort_unzip(Set1, Set2, Set3, Result) :-
-	custom_union(Set1, Set2, S12),
-	custom_union(S12, Set3, S123),
-	sort(S123, Sorted),
-	zip(_, Result, Sorted).
-
 contains_any(_, []) :- !, fail.
 contains_any([], _) :- !, fail.
 contains_any([X|Xs], Ys) :-
@@ -98,12 +93,25 @@ contains_any([X|Xs], Ys) :-
 		true;
 		contains_any(Xs, Ys).
 
+arrange([], [], []) :- !.
+arrange([TH|TT], UnorderedZip, [THDirs|Os]) :-
+	find_correct_and_patch_list(TH, UnorderedZip, THDirs, THLessZip),
+	arrange(TT, THLessZip, Os).
+
+find_correct_and_patch_list(Y-X, [Y-X-Dirs|Is], Dirs, Is) :- !.
+find_correct_and_patch_list(Tree, [Wrong|Is], Dirs, [Wrong|Os]) :-
+	find_correct_and_patch_list(Tree, Is, Dirs, Os).
+
 custom_intersection([], _, []) :- !.
 custom_intersection([X|Xs], Ys, Zs) :-
 	member(X, Ys) ->
 		Zs = [X|Zs1],
 		custom_intersection(Xs, Ys, Zs1);
 		custom_intersection(Xs, Ys, Zs).
+
+union3(Set1, Set2, Set3, S123) :-
+	custom_union(Set1, Set2, S12),
+	custom_union(S12, Set3, S123).
 
 custom_union(Xs, [], Xs) :- !.
 custom_union([], Ys, Ys) :- !.
